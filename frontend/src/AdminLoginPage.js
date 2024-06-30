@@ -20,7 +20,7 @@ function AdminLoginPage(props) {
           setNotfound(true);
           // alert("No Account with that Email and password..");
         } else {
-          localStorage.setItem("token", response?.token);
+          localStorage.setItem("admintoken", response?.token);
           // alert("Account Found");
           navigate("/AdminOperations");
           // UserOperations

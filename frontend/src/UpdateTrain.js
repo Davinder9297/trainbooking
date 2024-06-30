@@ -1,7 +1,8 @@
 import { React, useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import "./UpdateTrain.css";
+import { BASE_URL } from "./api";
 //import "./Login.css";
 
 export default function Updatetrain() {
@@ -22,32 +23,32 @@ export default function Updatetrain() {
   const [SeatAvailability, setSeatAvailability] = useState("");
 
   const navigate = new useNavigate();
+  const [search,setsearch]=useSearchParams()
 
   useEffect(() => {
     axios
       .get(
-        `https://localhost:7018/api/Train/${localStorage.getItem(
-          "TrainNo"
-        )}`
+    BASE_URL+'/gettrainbyid?_id='+search.get('_id')
       )
 
       .then(function (response) {
-        setOut(response.data[0]);
+        // console.log(response);
+        setOut(response.data.data[0]);
 
-        setTrainNo(response.data[0].TrainNo);
-        setTrainName(response.data[0].TrainName);
+        setTrainNo(response.data.data[0].TrainNo);
+        setTrainName(response.data.data[0].TrainName);
 
-        setOrigin(response.data[0].Origin);
+        setOrigin(response.data.data[0].Origin);
 
-        setDestination(response.data[0].Destination);
+        setDestination(response.data.data[0].Destination);
 
-        setDepartureTime(response.data[0].DepartureTime);
+        setDepartureTime(formatDateTime(response.data.data[0].DepartureTime));
 
-        setArrivalTime(response.data[0].ArrivalTime);
+        setArrivalTime(formatDateTime(response.data.data[0].ArrivalTime));
 
-        setFare(response.data[0].Fare);
+        setFare(response.data.data[0].Fare);
 
-        setSeatAvailability(response.data[0].SeatAvailability);
+        setSeatAvailability(response.data.data[0].SeatAvailability);
 
         console.log(response.data);
       });
@@ -55,7 +56,8 @@ export default function Updatetrain() {
 
   function handleSubmit(e) {
     const Data = {
-      TrainNo: localStorage.getItem("TrainNo"),
+      _id:search.get('_id'),
+      TrainNo: TrainNo,
       TrainName: TrainName,
       Origin: Origin,
 
@@ -70,13 +72,11 @@ export default function Updatetrain() {
       SeatAvailability: SeatAvailability,
     };
 
-    console.log(Data);
+    // console.log(Data);
 
     axios
       .put(
-        `https://localhost:7018/api/AdminLoginPage/Puttrain/${localStorage.getItem(
-          "TrainNo"
-        )}`,
+        BASE_URL+'/updatetrain',
         Data
       )
 
@@ -93,9 +93,17 @@ export default function Updatetrain() {
 
     e.preventDefault();
   }
-
+  const formatDateTime = (dateTime) => {
+    const date = new Date(dateTime);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
   return (
-    <div className="Login">
+    <div className="insert">
       {/*            {" "} */}
       <form className="Userform">
         <h1>UPDATE TRAIN</h1>
@@ -138,16 +146,20 @@ export default function Updatetrain() {
         <input
           required
           type="datetime-local"
+            className="p-3"
           defaultValue={Out.DepartureTime}
+          value={DepartureTime}
           onChange={(event) => setDepartureTime(event.target.value)}
         ></input>
        <label>Arrival Time</label>
         <input
           required
-          type="datetime-local"
+          type="datetime-local" 
+          className="p-3"
           min={DepartureTime}
           disabled={DepartureTime.length ? false : true}
           defaultValue={Out.ArrivalTime}
+          value={ArrivalTime}
           onChange={(event) => setArrivalTime(event.target.value)}
         ></input>
          <label>Available Seats</label>

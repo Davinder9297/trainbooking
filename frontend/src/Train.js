@@ -18,7 +18,32 @@ function Train() {
        );
       //  console.log(data);
      }, [data]);
+     useEffect(() => {
+      if(localStorage.getItem('token')){
+        navigate('UserOperations')
+      }
+      else if(localStorage.getItem('admintoken')){
+        navigate('AdminOperations')
+      }
+     }, [])
+
+function handleProperdate(isoDateString){
+  const date = new Date(isoDateString);
+
+  // Define options for date and time formatting
+  const optionsDate = { year: 'numeric', month: 'long', day: 'numeric' };
+  const optionsTime = { hour: 'numeric', minute: 'numeric', hour12: true };
+  
+  // Format the date
+  const formattedDate = date.toLocaleDateString('en-GB', optionsDate);
+  const formattedTime = date.toLocaleTimeString('en-GB', optionsTime);
+  // console.log('hello');
+  // console.log(`Date: ${formattedDate}`);
+// console.log(`Time: ${formattedTime}`);
+}
+     
 function Gettime(dateString){
+  handleProperdate(dateString)
   const dateObject = new Date(dateString);
   
   let hours = dateObject.getUTCHours();

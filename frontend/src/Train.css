@@ -46,22 +46,22 @@ min-height: 100%;
     cursor: pointer;
     font-weight:bold;
   }
-  button:hover{
+  /* button:hover{
     background-color: rgb(10, 234, 70);
     color: #FFF;
     font-size: 12px;
-  }
+  } */
   table {
     table-layout: fixed;
     width: 100%;
     border-collapse: collapse;
     border: 1px solid black;
-    border-radius:10px;
+    /* border-radius:10px; */
   }
   .thead-dark th {
 
     color:black;
-    background-color: aqua;
+    background-color: #1f2937;
     
   }
   .table-body td { 
@@ -81,7 +81,7 @@ min-height: 100%;
   }
   
   .content-table thead tr {
-    background-color: #000a98;
+    background-color: #1f2937;
     color: #ffffff;
     text-align: left;
     font-weight: bold;

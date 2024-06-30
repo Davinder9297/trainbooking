@@ -1,5 +1,8 @@
 import Train from "../models/train.js";
-
+import Users from "../models/signup.js";
+import mongoose from "mongoose";
+import nodemailer from "nodemailer";
+import 'dotenv/config'
 export  async function CreateTraindata(req,res,next){
     let {TrainNo,TrainName,Origin,Destination,ArrivalTime,DepartureTime,Fare,SeatAvailability}=req.body;
     try {
@@ -25,18 +28,27 @@ next()
 }
 
 export  async function Getalltraindetails(req,res,next){
-try {
-    const data=await Train.find({});
-    if(data){
-        res.status(200).json({data,success:true,message:"Data fetched successfully"});
-    }
-    else{
-        res.status(200).json({data,success:true,message:"No data found"});
-    }
-} catch (error) {
-    res.status(500).json({success:false,message:"Internal server error"});
-  
-}
+    try {
+        let filters = {};
+    
+        // Apply filters based on query parameters
+        if (req.query.origin) {
+            filters.Origin = { $regex: new RegExp(req.query.origin, 'i') };
+          }
+          if (req.query.destination) {
+            filters.Destination = { $regex: new RegExp(req.query.destination, 'i') };
+          }
+          if (req.query.departureTime) {
+            filters.DepartureTime = { $gte: new Date(req.query.departureTime) };
+          }
+    
+        // Execute the query with applied filters
+        const trains = await Train.find(filters);
+    
+        res.status(200).json({data:trains});
+      } catch (err) {
+        res.status(500).json({ message: err.message });
+      }
 }
 
 export async function Updatetrain(req,res,next){
@@ -90,7 +102,7 @@ export async function Gettraindatabyid(req,res,next){
      }
 }
 export async function DeleteTrain(req,res,next){
-    let {_id}=req.body;
+    let {_id}=req.query;
      try {
         if(!_id){
             res.status(404).json({success:false,message:"Id required"})
@@ -119,4 +131,183 @@ export async function DeleteTrain(req,res,next){
         res.status(500).json({success:false,message:"Internal server error"})
 
      }
+}
+export async function Bookticket(req,res,next){
+    let {userId,trainId}=req.query;
+    try {
+        // Find the user and train
+        const user = await Users.findById(userId);
+        const train = await Train.findById(trainId);
+    
+        if (!user) {
+          res.status(404).json({success:false,message:"User not found!"})
+        }
+    
+        if (!train) {
+            res.status(404).json({success:false,message:"Train not found!"})
+        }
+    
+        // Check if there are available seats
+        if (train.SeatAvailability <= 0) {
+            res.status(400).json({success:false,message:"No seats available"})
+        }
+    
+        // Allocate a seat number (example logic, you might want a different seat allocation logic)
+        const seatNumber = train.BookedSeats.length + 1;
+    
+        // Decrement available seats and add booked seat
+        train.SeatAvailability -= 1;
+        train.BookedSeats.push({ seatNumber, userId });
+    
+        // Save the train document
+        await train.save();
+        req.ticketdetails={train,seatNumber,user};
+    
+        
+        next()
+    res.status(201).json({success:true,message:"Ticket booked successfully"})
+      } catch (error) {
+        res.status(500).json({success:false,message:"Internal server error"})
+    }
+}
+export async function Sendmails(req,res,next){
+    // res.status(200).json(req.ticketdetails)
+    console.log(req.ticketdetails);
+    try {function Gettime(dateString) {
+        const dateObject = new Date(dateString);
+        const date = new Date(dateString);
+    
+        const optionsDate = { year: 'numeric', month: 'long', day: 'numeric' };
+        const optionsTime = { hour: 'numeric', minute: 'numeric', hour12: true };
+    
+        const formattedDate = date.toLocaleDateString('en-GB', optionsDate);
+        let hours = dateObject.getUTCHours();
+        const minutes = dateObject.getUTCMinutes();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+    
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+        return `${formattedDate} ${hours}:${formattedMinutes} ${ampm}`;
+      }
+        const transporter = nodemailer.createTransport({
+          service: "gmail",
+          port: 465,
+          secure: true, // Use `true` for port 465, `false` for all other ports
+          auth: {
+            user: process.env.USEREMAIL,
+            pass: process.env.PASSWORD,
+          },
+        });
+    
+        const info = await transporter.sendMail({
+          from: {
+            name: 'Train Ticket Booking System',
+            address: process.env.USEREMAIL,
+          },
+          to: `${req.ticketdetails.user.Email}`, // Replace with recipient email
+          subject: "Ticket Confirmation", // Subject line
+          html: `
+          <h2 style="color: #333;">Your Train Ticket and Seat Information</h2>
+          <div style="background: #f5f5f5; padding: 15px; margin-bottom: 20px;">
+              <h3>Train Journey Details</h3>
+              <p><strong>Train Name and Number:</strong> ${req.ticketdetails.train.TrainName}/${req.ticketdetails.train.TrainNo}</p>
+              <p><strong>Departure Date and Time:</strong> ${Gettime(req.ticketdetails.train.DepartureTime)}</p>
+              <p><strong>Arrival Date and Time:</strong> ${Gettime(req.ticketdetails.train.ArrivalTime)}</p>
+              <p><strong>Destination :</strong> ${req.ticketdetails.train.Destination}</p>
+              <p><strong>Origin :</strong> ${req.ticketdetails.train.Origin}</p>
+              <p><strong>Ticket Cost :</strong> ${req.ticketdetails.train.Fare}</p>
+          </div>
+  
+          <div style="background: #f5f5f5; padding: 15px; margin-bottom: 20px;">
+              <h3>Passenger Information</h3>
+              <p><strong>Passenger Name:</strong> ${req.ticketdetails.user.FirstName} ${req.ticketdetails.user.LastName}</p>
+              <p><strong>Contact Information:</strong> ${req.ticketdetails.user.PhoneNumber}</p>
+          </div>
+  
+          <div style="background: #f5f5f5; padding: 15px; margin-bottom: 20px;">
+              <h3>Seat Information</h3>
+              <p><strong>Seat Number:</strong> ${req.ticketdetails.seatNumber}</p>
+          </div>
+  
+          <div style="margin-top: 20px; font-size: 1em;">
+              <p>If there are any discrepancies or if you have any questions, feel free to reach out to us at trainbooking028@gmail.com.</p>
+              <p>We wish you a pleasant journey and thank you for choosing to travel with us.</p>
+          </div>
+      `
+        });
+    res.status(200).end()
+        // res.status(200).json(info);
+      } catch (error) {
+        console.error("Error sending email:", error);
+        res.status(500).json({ message: "Internal server error" });
+      }
+}
+
+export async function getUserDetailsWithBookings(req,res,next) {
+    try {
+        const users = await Train.find().populate({
+            path: 'BookedSeats.userId',
+            select: 'FirstName LastName UserName PhoneNumber Email'
+        }).exec();
+        if(users){
+            res.status(200).json({success:true,users})
+        }
+        else{
+            res.status(404).json({success:false,message:"No bookings founds"})
+
+        }
+    } catch (error) {
+        res.status(500).json({success:false,message:"Internal server error"})
+        throw error;
+    }
+}
+
+export async function Getbookingsofuser(req,res,next){
+    let {userId}=req.query;
+    try {
+        const users = await Train.find({ "BookedSeats.userId": mongoose.Types.ObjectId.createFromHexString(userId) })
+            .populate({
+                path: 'BookedSeats.userId',
+                select: 'FirstName LastName UserName PhoneNumber Email',
+            })
+            .exec();
+            const bookings = users.flatMap(train => {
+                const numberOfBookings = train.BookedSeats.filter(seat => seat.userId._id.toString() === userId).length;
+                return Array(numberOfBookings).fill(train);
+            });
+            if(bookings){
+                res.status(200).json({success:true,bookings})
+            }
+            else{
+                res.status(404).json({success:false,message:"No bookings found for this user"})
+    
+            }
+    } catch (error) {
+        res.status(500).json({success:false,message:"Internal server error"})
+        throw error;
+    }
+}
+export async function Trainfilters(req,res,next){
+    try {
+        let filters = {};
+    
+        // Apply filters based on query parameters
+        if (req.query.origin) {
+            filters.Origin = { $regex: new RegExp(req.query.origin, 'i') };
+          }
+          if (req.query.destination) {
+            filters.Destination = { $regex: new RegExp(req.query.destination, 'i') };
+          }
+          if (req.query.departureTime) {
+            filters.DepartureTime = { $gte: new Date(req.query.departureTime) };
+          }
+    
+        // Execute the query with applied filters
+        const trains = await Train.find(filters);
+    
+        res.status(200).json(trains);
+      } catch (err) {
+        res.status(500).json({ message: err.message });
+      }
 }

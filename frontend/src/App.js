@@ -11,6 +11,8 @@ import UpdateTrain from './UpdateTrain';
 import InsertTrain from './InsertTrain';
 import UserOperations from './UserOperations';
 import TicketInfo from './TicketInfo';
+import TicketComponent from "./Imagegen";
+import Emailsend from "./email";
 const App = () => {
     
     return (
@@ -28,6 +30,7 @@ const App = () => {
                         <Route path="/InsertTrain" element={<InsertTrain/>} />
                         <Route path="/UserOperations" element={<UserOperations/>} />
                         <Route path="/TicketInfo" element={<TicketInfo/>} />
+                        <Route path="/t" element={<Emailsend/>} />
                     </Routes>
                 </Router>
             </div>

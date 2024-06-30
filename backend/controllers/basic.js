@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import Signup from "../models/signup.js";
+import Users from "../models/signup.js";
 import jwt from 'jsonwebtoken'
 import multer from "multer";
 import bcrypt from 'bcrypt'
@@ -21,7 +21,7 @@ export async function Signupcontroller(req, res, next) {
       return next();
     }
   
-    const user = await Signup.findOne({ Email });
+    const user = await Users.findOne({ Email });
     if (user) {
       res.status(400).json({ success: false, message: "Email already exists" });
       return next();
@@ -31,7 +31,7 @@ export async function Signupcontroller(req, res, next) {
     // const data = await Signup.findOne({ email: email });
         bcrypt.hash(Password,10,async function(error,hash){
             if(!error){
-                await Signup.create({  FirstName, LastName, PhoneNumber,UserName,Email, Password:hash });
+                await Users.create({  FirstName, LastName, PhoneNumber,UserName,Email, Password:hash });
     
             }
         })
@@ -55,7 +55,7 @@ export async function Login(req,res){
         }
         else{
             
-            const data=await Signup.findOne({Email})
+            const data=await Users.findOne({Email})
             // console.log(data);
             if(data){
                 bcrypt.compare(Password,data.Password,function(error,result){
@@ -66,7 +66,8 @@ export async function Login(req,res){
                             LastName:data.LastName, 
                             PhoneNumber:data.PhoneNumber,
                             UserName:data.UserName,
-                            Email:data.Email
+                            Email:data.Email,
+                            userId:data._id
                             
                             
                         },process.env.SECRET_KEY,(error,token)=>{
@@ -100,7 +101,7 @@ export async function AdminLogin(req,res){
         }
         else{
             
-            const data=await Signup.findOne({Email,Role:"admin"})
+            const data=await Users.findOne({Email,Role:"admin"})
             // console.log(data);
             if(data){
                 bcrypt.compare(Password,data.Password,function(error,result){
@@ -144,7 +145,7 @@ export async function handleFiles(req,res,next){
         res.status(400).json({success:false,message:"Image required"})
     }
     else{
-        await Signup.findOneAndUpdate({email:req.body.email},{profile:req.profile.toString()},{new :true})
+        await Users.findOneAndUpdate({email:req.body.email},{profile:req.profile.toString()},{new :true})
         res.status(200).json({success:true,message:"updated"})
     }
   } catch (error) {
@@ -155,7 +156,7 @@ export async function handleFiles(req,res,next){
 export async function Getuser(req,res,next){
     try {
         let {email}=req.body;
-        let user=await Signup.findOne({email})
+        let user=await Users.findOne({email})
         // res.set('Content-Type', 'text/html');
         // res.render(`<img src='./uploads/${user.profile}'/>`)
         let imagePath=`../uploads/${user.profile}`

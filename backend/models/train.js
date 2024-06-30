@@ -33,7 +33,8 @@ const schema=mongoose.Schema({
     SeatAvailability:{
         type:Number,
         required:true,
-    }
+    },
+    BookedSeats: [{ seatNumber: Number, userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Users' } }],
 })
 const Train=mongoose.model('Trains',schema);
 export default Train;

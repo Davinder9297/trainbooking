@@ -27,11 +27,11 @@
         width: 100%;
         border-collapse: collapse;
         border: 1px solid black;
-        border-radius:20px;
+        /* border-radius:20px; */
       }
       .thead-dark th {
     
-        color:#000a98;
+        color:#ffffff;
       }
       .table-body td { 
           color: black;
@@ -50,7 +50,7 @@
       }
       
       .content-table thead tr {
-        background-color: #43c6ea;
+        background-color: #1f2937;
         color: #ffffff;
         text-align: left;
         font-weight: bold;
@@ -74,12 +74,12 @@
       }
       
       .content-table tbody tr:last-of-type {
-        border-bottom: 2px solid #000a98;
+        border-bottom: 2px solid #ffffff;
       }
       
       .content-table tbody tr.active-row {
         font-weight: bold;
-        color: #000a98;
+        color: #ffffff;
       }
 
       .admin-action button{
@@ -97,11 +97,6 @@
         cursor: pointer;
         font-weight: bold;
       }
-      .admin-action button:hover{
-        background-color: rgb(33, 42, 207);
-        /* color: #FFF; */
-        font-size: 12px;
-      }
 
       .admin-ops-insert button{
         border:1px solid black;
@@ -113,10 +108,4 @@
         background-color: #43c6ea;
         font-weight: bold;
         align-items:center;
-      }
-
-      .admin-ops-insert button:hover{
-        background-color: rgb(214, 29, 174);
-        /* color: #FFF; */
-        font-size: 12px;
       }

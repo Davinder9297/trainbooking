@@ -67,13 +67,14 @@
         justify-content: space-around;
         margin: 0 auto;
         max-width: 450px;
-        height: 700px;
+        height: 600px;
         overflow-y: auto;
         padding: 15px;
       }
       .insert form::-webkit-scrollbar{
         width: 0px;
       }
+     
       
       
       .field1{

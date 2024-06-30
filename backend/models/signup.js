@@ -29,12 +29,7 @@ const schema=mongoose.Schema({
         type: String,
         enum: ['user' , 'admin'],
         default: 'user'
-    },
-    Bookings:[
-        {type:mongoose.Schema.Types.ObjectId,
-        ref: 'Bookings'
-        }
-    ]
+    }
 })
-const Signup=mongoose.model('Users',schema);
-export default Signup;
+const Users=mongoose.model('Users',schema);
+export default Users;

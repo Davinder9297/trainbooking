@@ -2,25 +2,28 @@ import { React, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import './AdminOperations.css'
+import toast, { Toaster } from 'react-hot-toast';
 import { BASE_URL } from "./api";
 
 function AdminOps() {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
-  function Gettime(dateString){
+  function Gettime(dateString) {
     const dateObject = new Date(dateString);
-    
+    const date = new Date(dateString);
+
+    const optionsDate = { year: 'numeric', month: 'long', day: 'numeric' };
+    const optionsTime = { hour: 'numeric', minute: 'numeric', hour12: true };
+
+    const formattedDate = date.toLocaleDateString('en-GB', optionsDate);
     let hours = dateObject.getUTCHours();
     const minutes = dateObject.getUTCMinutes();
-    const seconds = dateObject.getUTCSeconds();
     const ampm = hours >= 12 ? 'PM' : 'AM';
-    
+
     hours = hours % 12;
-    hours = hours ? hours : 12; // the hour '0' should be '12'
-    
-    // Format minutes and seconds to always show two digits
+    hours = hours ? hours : 12;
     const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
-  return `${hours}:${formattedMinutes} ${ampm}`
+    return `${formattedDate} ${hours}:${formattedMinutes} ${ampm}`;
   }
   useEffect(() => {
     // debugger;
@@ -30,12 +33,17 @@ function AdminOps() {
     // console.log(data);
     // debugger;
   }, [data]);
-  const setTrainNumber=(tn)=>{
-    localStorage.setItem("TrainNo",tn)
-  }
+
   const del=(dl)=>{
-    axios.delete("https://localhost:7018/api/AdminLoginPage/Deletetrain/"+dl).then(function(response){
-      console.log(response)
+    axios.delete(BASE_URL+'/deletetrain?_id='+dl).then(function(response){
+      // console.log(response)
+      if(response?.data?.success){
+        toast.success(response?.data?.message)
+      }
+      else{
+        toast.error(response?.data?.message)
+
+      }
     }).catch(function(error){
       console.log(error)
     })
@@ -43,11 +51,12 @@ function AdminOps() {
   }
   return (
     <>
+    <Toaster />
     <div className="admin-ops">
 
     
       <div >
-        <h1>ADMIN DASHBOARD</h1>
+        <h1 className="text-black font-bold text-2xl">ADMIN DASHBOARD</h1>
         <br />
         {/* <button onClick={() => navigate("/UpdateTrain")}>Update Train</button>
         <br />
@@ -76,7 +85,7 @@ function AdminOps() {
             <tbody>
               {data.map((item) => {
                 return (
-                  <tr key={item.TrainNo}>
+                  <tr key={item._id}>
                     <td><b>{item.TrainNo}</b></td>
                     <td><b>{item.TrainName}</b></td>
                     <td>{item.Origin}</td>
@@ -85,12 +94,12 @@ function AdminOps() {
                     <td>{Gettime(item.DepartureTime)}</td>
                     <td>{item.Fare}</td>
                     <td>{item.SeatAvailability}</td>
-                    <Link to='/UpdateTrain'>
-                    <button className="admin-action" onClick={() => setTrainNumber(item.TrainNo)}>Update Train</button>
+                    <div className="flex gap-2">
+                    <Link to={`/UpdateTrain?_id=${item?._id}`}>
+                    <p className="px-2 py-1 bg-black text-white rounded mt-2" >Update</p>
                     </Link>
-                    <Link to='/AdminOperations'>
-                    <button className="admin-train" onClick={() => del(item.TrainNo)}>Delete</button>
-                    </Link>
+                    <p className="cursor-pointer px-2 py-1 bg-black text-white rounded mt-2" onClick={() => del(item._id)}>Delete</p>
+                    </div>
                   </tr>
                 );
               })}
