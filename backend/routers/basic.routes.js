@@ -3,7 +3,7 @@ import  { AdminLogin, Login, Signupcontroller, handleFiles } from '../controller
 import upload from '../middlewares/images.js';
 import { Authenticate } from '../middlewares/authenticate.js';
 import multer from 'multer'
-import {Bookticket, CreateTraindata, DeleteTrain, Getalltraindetails, Getbookingsofuser, Gettraindatabyid, Sendmails, Trainfilters, Updatetrain, getUserDetailsWithBookings}from '../controllers/Train.controllers.js';
+import {Bookticket, CreateTraindata, DeleteTrain, Getalltraindetails, Getbookingsofuser, Getticket, Gettraindatabyid, Sendmails, Trainfilters, Updatetrain, getUserDetailsWithBookings}from '../controllers/Train.controllers.js';
 export const router=Router()
 
 // router.route('/home').get(Basic);
@@ -19,6 +19,7 @@ router.route('/booktrain').post(Bookticket,Sendmails);
 router.route('/getbookings').get(getUserDetailsWithBookings);
 router.route('/getbookingbyuserid').get(Getbookingsofuser);
 router.route('/filtertrain').get(Trainfilters);
+router.route('/getticket').get(Getticket);
 router.route('/mail').get(Sendmails);
 
 router.route('/update').put(upload.single('profile'),handleFiles);

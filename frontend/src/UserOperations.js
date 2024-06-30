@@ -123,7 +123,10 @@ let navigate=useNavigate()
         toast.error('Failed to fetch train data');
       });
   }
-
+function handleLogout(){
+  localStorage.removeItem('token')
+  navigate('/')
+}
   return (
     <>
       <Toaster />
@@ -181,6 +184,14 @@ let navigate=useNavigate()
                 View Tickets
               </Link>
             </div>
+            <div className="sm:w-auto px-2  sm:mt-0">
+              <button
+                onClick={handleLogout}
+                className="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              >
+                Log Out
+              </button>
+            </div>
           </div>
           {data.length === 0 ? (
             <p className="text-center text-gray-700">No trains found.</p>
@@ -208,11 +219,12 @@ let navigate=useNavigate()
                     <td className="border px-4 py-2 capitalize">{item.Destination}</td>
                     <td className="border px-4 py-2 capitalize">{Gettime(item.ArrivalTime)}</td>
                     <td className="border px-4 py-2 capitalize">{Gettime(item.DepartureTime)}</td>
-                    <td className="border px-4 py-2 capitalize">{item.SeatAvailability}</td>
+                    <td className="border px-4 py-2 capitalize">{item.SeatAvailability<=0 ? 'Sold Out' : item.SeatAvailability}</td>
                     <td className="border px-4 py-2 capitalize">{item.Fare}</td>
                     <td className="border px-2 py-2 ">
                       <button
-                        className="bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                      disabled={item.SeatAvailability<=0}
+                        className={`bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${item.SeatAvailability<=0 ? 'cursor-not-allowed opacity-50' : ''}`}
                         onClick={() => loadRazorpay(item.Fare, item._id)}
                       >
                         Book Train

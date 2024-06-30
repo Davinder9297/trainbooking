@@ -65,9 +65,6 @@ function AdminOps() {
       </div>
       <div>
         <div>
-          <div className="row" style={{ margin: "10px" }}>
-            {/* <div className="col-sm-12 btn btn-info"></div> */}
-          </div>
           <table class="content-table">
             <thead class="thead-dark">
               <tr>
@@ -93,7 +90,7 @@ function AdminOps() {
                     <td>{Gettime(item.ArrivalTime)}</td>
                     <td>{Gettime(item.DepartureTime)}</td>
                     <td>{item.Fare}</td>
-                    <td>{item.SeatAvailability}</td>
+                    <td>{item.SeatAvailability<=0 ? 'Sold Out' : item.SeatAvailability}</td>
                     <div className="flex gap-2">
                     <Link to={`/UpdateTrain?_id=${item?._id}`}>
                     <p className="px-2 py-1 bg-black text-white rounded mt-2" >Update</p>

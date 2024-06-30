@@ -228,6 +228,7 @@ export async function Sendmails(req,res,next){
           <div style="background: #f5f5f5; padding: 15px; margin-bottom: 20px;">
               <h3>Seat Information</h3>
               <p><strong>Seat Number:</strong> ${req.ticketdetails.seatNumber}</p>
+              <a href='${process.env.FRONTEND}/getticket?userId=${req.ticketdetails.user._id}&trainId=${req.ticketdetails.train._id}&seat=${req.ticketdetails.seatNumber}' target="_blank"><strong>Download your ticket:</strong></a>
           </div>
   
           <div style="margin-top: 20px; font-size: 1em;">
@@ -310,4 +311,21 @@ export async function Trainfilters(req,res,next){
       } catch (err) {
         res.status(500).json({ message: err.message });
       }
+}
+
+export async function Getticket(req,res,next){
+    let {userId,trainId}=req.query;
+    try {
+        if(!userId || !trainId){
+            res.status(404).json({success:false,message:"User id and Train id is required"})
+        }
+        else{
+            const train=await Train.findById(trainId);
+            const user=await Users.findById(userId);
+            res.status(200).json({train,user,success:true})
+        }
+    } catch (error) {
+        res.status(200).json({success:true,message:"Internal server error"})
+
+    }
 }

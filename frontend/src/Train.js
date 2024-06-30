@@ -63,9 +63,9 @@ const navigate=useNavigate();
     <div className = "container" >
         <div className = "navbar-train"><h1>RAILWAY RESERVATION SYSTEM</h1>
         <p className="nav-link">
-          <button  onClick={() => navigate("/AdminLoginPage")}>
+          {/* <button  onClick={() => navigate("/AdminLoginPage")}>
             Admin Login
-          </button>
+          </button> */}
           <button onClick={() => navigate("/UserRegistration")}>
             SignUp User 
           </button>
@@ -100,7 +100,7 @@ const navigate=useNavigate();
                     <td>{Gettime(item.ArrivalTime)}</td>
                     <td>{Gettime(item.DepartureTime)}</td>
                     <td>{item.Fare}</td>
-                    <td>{item.SeatAvailability}</td>
+                    <td>{item.SeatAvailability<=0 ? 'Sold Out' : item.SeatAvailability}</td>
                   </tr>
                 );
              })}
