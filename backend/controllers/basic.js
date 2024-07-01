@@ -29,21 +29,24 @@ export async function Signupcontroller(req, res, next) {
   
   
     // const data = await Signup.findOne({ email: email });
+
         bcrypt.hash(Password,10,async function(error,hash){
             if(!error){
-                await Users.create({  FirstName, LastName, PhoneNumber,UserName,Email, Password:hash });
-    
+               let temp=await Users.create({  FirstName, LastName, PhoneNumber,UserName,Email, Password:hash });
+                // console.log(temp);
+                jwt.sign({ FirstName, LastName, PhoneNumber,UserName,Email,userId:temp._id}, process.env.SECRET_KEY, (error, token) => {
+                    if (!error) {
+                      res.status(201).json({ success: true, message: "User registered successfully",token });
+                      next();
+                    } else {
+                      res.status(500).json({ success: false, message: "Error generating token" });
+                      next();
+                    }
+                  });
             }
         })
-    jwt.sign({ FirstName, LastName, PhoneNumber,UserName,Email}, process.env.SECRET_KEY, (error, token) => {
-      if (!error) {
-        res.status(201).json({ success: true, message: "User registered successfully", token });
-        next();
-      } else {
-        res.status(500).json({ success: false, message: "Error generating token" });
-        next();
-      }
-    });
+        
+    
 }
 
 export async function Login(req,res){

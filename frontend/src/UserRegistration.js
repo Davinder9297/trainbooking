@@ -66,8 +66,8 @@ export default function UserRegistration() {
         return errors;
     };
 
-    async function Submit(e) {
-        e.preventDefault();
+    async function Submit() {
+        // e.preventDefault();
         // console.log(Allok);
         const out = {
             "FirstName": FirstName,
@@ -87,6 +87,8 @@ export default function UserRegistration() {
                     // console.log(response.data);
                     // console.log(response.status);
                     setIsSubmit(true);
+                    localStorage.setItem('token',response.data.token)
+                    navigate('/')
                 })
                 .catch(function (error) {
                     if (error.request.status === 500) {
@@ -99,12 +101,9 @@ export default function UserRegistration() {
     }
     return (
         <>
-            <div className='Login'>
-                {Allok && isSubmit ? (
-                <><form ><div >Registration successfull<br/>Login Again</div><button onClick={() => navigate('/Train')}>Ok</button></form>
-                    </>
-            ) : (<>
-            <form className="Userform ">
+            <div className='insert'>
+               
+            <div className="Userform">
             {/* <div><img className="reg" src ={Register} alt="admin" /></div> */}
                     <h1>USER REGISTRATION</h1>
                     <div >
@@ -152,11 +151,11 @@ export default function UserRegistration() {
                     <input required type="password" placeholder="Confirm Password" onChange={event => setCPassword(event.target.value)}></input>
 
 
-                    <button className="submitButton" onClick={(e) => Submit(e)}>Register</button>
+                    <button className="submitButton" onClick={Submit}>Register</button>
                     <br />
                     <NavLink className="p1" to="/UserLogin"><b>Already have account</b></NavLink>
-                    </form>
-                    </>)}
+                    </div>
+                
             </div>
 
 
