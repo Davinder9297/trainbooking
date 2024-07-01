@@ -9,6 +9,16 @@ import { BASE_URL } from "./api";
 
 function Train() {
     const [data, setData] = useState([]);
+    const navigate=useNavigate();
+    useEffect(() => {
+      if(localStorage.getItem('token')){
+        navigate('/UserOperations')
+      }
+      else if(localStorage.getItem('admintoken')){
+        navigate('/AdminOperations')
+      }
+     }, [])
+
      useEffect(() => {
        axios.get(BASE_URL+'/getalltrains').then((result) =>{
         // console.log(result)
@@ -18,15 +28,7 @@ function Train() {
        );
       //  console.log(data);
      }, []);
-     useEffect(() => {
-      if(localStorage.getItem('token')){
-        navigate('/UserOperations')
-      }
-      else if(localStorage.getItem('admintoken')){
-        navigate('/AdminOperations')
-      }
-     }, [])
-
+    
 function handleProperdate(isoDateString){
   const date = new Date(isoDateString);
 
@@ -58,7 +60,6 @@ function Gettime(dateString){
   const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
 return `${hours}:${formattedMinutes} ${ampm}`
 }
-const navigate=useNavigate();
   return (
     <div className = "container" >
         <div className = "navbar-train"><h1>RAILWAY RESERVATION SYSTEM</h1>
