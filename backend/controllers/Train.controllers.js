@@ -2,7 +2,9 @@ import Train from "../models/train.js";
 import Users from "../models/signup.js";
 import mongoose from "mongoose";
 import nodemailer from "nodemailer";
+import crypto from 'crypto'
 import 'dotenv/config'
+import OTP from "../models/otp.js";
 export  async function CreateTraindata(req,res,next){
     let {TrainNo,TrainName,Origin,Destination,ArrivalTime,DepartureTime,Fare,SeatAvailability}=req.body;
     try {
@@ -327,5 +329,66 @@ export async function Getticket(req,res,next){
     } catch (error) {
         res.status(200).json({success:true,message:"Internal server error"})
 
+    }
+}
+function generateOTP() {
+    return crypto.randomInt(100000, 999999).toString();
+  }
+  async function sendOTP(email, otp) {
+    const transporter = nodemailer.createTransport({
+        service: "gmail",
+        port: 465,
+        secure: true, // Use `true` for port 465, `false` for all other ports
+        auth: {
+          user: process.env.USEREMAIL,
+          pass: process.env.PASSWORD,
+        },
+      });
+  
+      const info = await transporter.sendMail({
+        from: {
+          name: 'Train Ticket Booking System',
+          address: process.env.USEREMAIL,
+        },
+        to: `${email}`, // Replace with recipient email
+        subject: "OTP Verfication", // Subject line
+        html: `<p>Your OTP is <strong>${otp}</strong></p>`
+      });
+  }
+export async function Generateotp(req,res,next){
+    const email = req.body.email;
+const data=await Users.findOne({Email:email})
+if(data){
+    res.status(400).json({message:"Email already exists",success:false})
+}
+else{
+  const otp = generateOTP();
+
+  try {
+    await OTP.create({ email, otp });
+    await sendOTP(email, otp);
+    res.status(200).json({message:"OTP sent successfully",success:true});
+  } catch (error) {
+    res.status(500).json({message:"Incorrect Email",success:false});
+    // console.error(error);
+  }
+}
+}
+export async function Verifyotp(req,res,next){
+
+    const { email, otp } = req.body;
+
+    try {
+      const otpEntry = await OTP.findOne({ email, otp });
+  
+      if (otpEntry) {
+        await OTP.deleteOne({ _id: otpEntry._id }); 
+        res.status(200).json({message:"OTP verified successfully",success:true});
+    } else {
+        res.status(400).json({message:"Invalid OTP",success:false});
+      }
+    } catch (error) {
+      res.status(500).send('Error verifying OTP');
+      console.error(error);
     }
 }

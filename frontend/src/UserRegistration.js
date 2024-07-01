@@ -16,6 +16,9 @@ export default function UserRegistration() {
     const [CPassword, setCPassword] = useState('');
     const [formErrors, setFormErrors] = useState({});
     const [Allok, setAllok] = useState(false);
+    const [registerVaild, setregisterVaild] = useState(false)
+    const [otp, setotp] = useState()
+    const [showotpfield, setshowotpfield] = useState(false)
 
     const [isSubmit, setIsSubmit] = useState(false);
 
@@ -66,6 +69,65 @@ export default function UserRegistration() {
         }
         return errors;
     };
+async function Generate(){
+    if(!Email){
+        toast.error("Email required for OTP")
+    }
+    else{
+        try {
+            const data=await fetch(BASE_URL+'/generateotp',{
+                method:'POST',
+                headers:{
+                    'Accept':"application/json",
+                    'Content-type':"application/json",
+                },
+                body:JSON.stringify({email:Email})
+            })
+            const response=await data.json();
+            if(response.success){
+                toast.success(response.message)
+                setshowotpfield(true)
+            }
+            else{
+                toast.error(response.message)
+            }
+            
+        } catch (error) {
+            
+        }
+    }
+}
+async function Verify(){
+    if(!Email){
+        toast.error("Email required for OTP")
+    }
+   else if(!otp){
+        toast.error("OTP required for verification")
+    }
+    else{
+        try {
+            const data=await fetch(BASE_URL+'/verifyotp',{
+                method:'POST',
+                headers:{
+                    'Accept':"application/json",
+                    'Content-type':"application/json",
+                },
+                body:JSON.stringify({email:Email,otp})
+            })
+            const response=await data.json();
+            if(response.success){
+                toast.success(response.message)
+                setregisterVaild(true)
+            }
+            else{
+                toast.error(response.message)
+            }
+            
+        } catch (error) {
+            
+        }
+    }
+}
 
     async function Submit() {
         // e.preventDefault();
@@ -130,12 +192,15 @@ export default function UserRegistration() {
                     <input required type="text" placeholder="Username" onChange={event => setUserName(event.target.value)}></input>
 
                     <div >
-                        <label>Email</label>
+                        <div className="flex justify-between w-full"><label>Email</label>{ !registerVaild ? <p onClick={Generate} className="font-semibold text-black  cursor-pointer">Send OTP</p>:''}</div>
                         {<label className="labelalert">{formErrors.email}</label>}
                     </div>
-
-
-                    <input required type="text" placeholder="Email" onChange={event => setEmail(event.target.value)}></input>
+                    <input required type="email" placeholder="Email" onChange={event => setEmail(event.target.value)}></input>
+                    {showotpfield && !registerVaild? <div >
+                        <div className="flex justify-between w-full"><label>OTP</label><p onClick={Verify} className="font-semibold text-black  cursor-pointer">Verify</p></div>     
+                    <input required type="number" placeholder="OTP" onChange={event => setotp(event.target.value)}></input>
+                    </div>:''
+}
                     <div >
                         <label>Password</label>
                         {<label className="labelalert">{formErrors.password}</label>}
@@ -149,7 +214,7 @@ export default function UserRegistration() {
                     <input required type="password" placeholder="Confirm Password" onChange={event => setCPassword(event.target.value)}></input>
 
 
-                    <button className="submitButton" onClick={Submit}>Register</button>
+                    <div className={`w-full bg-[#F55A00] flex justify-center items-center p-2 mt-2 rounded text-white text-lg ${!registerVaild ? 'cursor-not-allowed' : 'cursor-pointer'}`} onClick={registerVaild ? Submit : ''} disabled={registerVaild}>Register</div>
                     <br />
                     <NavLink className="p1" to="/UserLogin"><b>Already have account</b></NavLink>
                     </div>
