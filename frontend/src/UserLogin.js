@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "./api";
+import toast, { Toaster } from "react-hot-toast";
 //import './Login.css';
 
 function UserLogin(props) {
@@ -18,8 +19,10 @@ function UserLogin(props) {
         //console.log(response.data[0].matches)
         if (!response.success) {
           setNotfound(true);
+          toast.error(response.message)
           // alert("No Account with that Email and password..");
         } else {
+          toast.success(response.message)
           localStorage.setItem("token", response?.token);
           // alert("Account Found");
           navigate("/UserOperations");
@@ -35,7 +38,8 @@ function UserLogin(props) {
   const [Password, setPassword] = useState("");
   const [Notfound, setNotfound] = useState(false);
   return (
-    // <>
+    <>
+    <Toaster/>
     <div className="Login">
       <div className="Userform"
        onSubmit={(e)=>e.preventDefault()}
@@ -68,6 +72,7 @@ function UserLogin(props) {
       {/* <>{IsLoggedin && navigate("/AdminOps")}</> */}
     {/* </> */}
     </div>
+    </>
   );
 }
 export default UserLogin;

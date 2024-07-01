@@ -17,13 +17,13 @@ function Train() {
       
        );
       //  console.log(data);
-     }, [data]);
+     }, []);
      useEffect(() => {
       if(localStorage.getItem('token')){
-        navigate('UserOperations')
+        navigate('/UserOperations')
       }
       else if(localStorage.getItem('admintoken')){
-        navigate('AdminOperations')
+        navigate('/AdminOperations')
       }
      }, [])
 

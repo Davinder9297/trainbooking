@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { NavLink, useNavigate } from "react-router-dom";
 import { BASE_URL } from "./api";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function UserRegistration() {
     let navigate = useNavigate();
@@ -88,19 +89,16 @@ export default function UserRegistration() {
                     // console.log(response.status);
                     setIsSubmit(true);
                     localStorage.setItem('token',response.data.token)
-                    navigate('/')
+                    navigate('/UserOperations')
                 })
                 .catch(function (error) {
-                    if (error.request.status === 500) {
-                        alert("Username already exist")
-                    } else {
-                        alert(error.message)
-                    }
+                        toast.error("Internal server error")
                 });
         }
     }
     return (
         <>
+        <Toaster/>
             <div className='insert'>
                
             <div className="Userform">
