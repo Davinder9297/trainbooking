@@ -230,7 +230,7 @@ export async function Sendmails(req,res,next){
           <div style="background: #f5f5f5; padding: 15px; margin-bottom: 20px;">
               <h3>Seat Information</h3>
               <p><strong>Seat Number:</strong> ${req.ticketdetails.seatNumber}</p>
-              <a href='${process.env.FRONTEND}/getticket?userId=${req.ticketdetails.user._id}&trainId=${req.ticketdetails.train._id}&seat=${req.ticketdetails.seatNumber}' target="_blank"><strong>Download your ticket:</strong></a>
+              <a href='https://trainbooking.vercel.app/getticket?userId=${req.ticketdetails.user._id}&trainId=${req.ticketdetails.train._id}&seat=${req.ticketdetails.seatNumber}' target="_blank"><strong>Download your ticket:</strong></a>
           </div>
   
           <div style="margin-top: 20px; font-size: 1em;">
