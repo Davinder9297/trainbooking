@@ -267,28 +267,47 @@ export async function getUserDetailsWithBookings(req,res,next) {
 }
 
 export async function Getbookingsofuser(req,res,next){
-    let {userId}=req.query;
+    const { userId } = req.query;
+
+    if (!userId) {
+        return res.status(400).json({ success: false, message: "User ID is required" });
+    }
+
     try {
-        const users = await Train.find({ "BookedSeats.userId": mongoose.Types.ObjectId.createFromHexString(userId) })
+        const userObjectId = mongoose.Types.ObjectId.createFromHexString(userId);
+
+        // Find all trains where the user has booked seats
+        const trains = await Train.find({ "BookedSeats.userId": userObjectId })
             .populate({
                 path: 'BookedSeats.userId',
                 select: 'FirstName LastName UserName PhoneNumber Email',
             })
             .exec();
-            const bookings = users.flatMap(train => {
-                const numberOfBookings = train.BookedSeats.filter(seat => seat.userId._id.toString() === userId).length;
-                return Array(numberOfBookings).fill(train);
-            });
-            if(bookings){
-                res.status(200).json({success:true,bookings})
-            }
-            else{
-                res.status(404).json({success:false,message:"No bookings found for this user"})
-    
-            }
+            console.log(trains);
+
+        // Prepare a detailed list of bookings
+        const bookings = trains.flatMap(train => {
+            return train.BookedSeats
+                .map(seat => ({
+                    TrainNo: train.TrainNo,
+                    TrainName: train.TrainName,
+                    Origin: train.Origin,
+                    Destination: train.Destination,
+                    ArrivalTime: train.ArrivalTime,
+                    DepartureTime: train.DepartureTime,
+                    Fare: train.Fare,
+                    seatNumber: seat.seatNumber,
+                    user: seat.userId
+                }));
+        });
+        if (bookings.length > 0) {
+            res.status(200).json({ success: true, bookings });
+        } else {
+            res.status(404).json({ success: false, message: "No bookings found for this user" });
+        }
     } catch (error) {
-        res.status(500).json({success:false,message:"Internal server error"})
-        throw error;
+        res.status(500).json({ success: false, message: "Internal server error" });
+        // next(error);
     }
 }
 export async function Trainfilters(req,res,next){

@@ -8,6 +8,7 @@ import { BASE_URL } from "./api";
 function AdminOps() {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
+  
   function Gettime(dateString) {
     const dateObject = new Date(dateString);
     const date = new Date(dateString);

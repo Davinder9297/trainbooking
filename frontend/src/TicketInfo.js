@@ -82,14 +82,14 @@ function Ticketinfo() {
               {data.map((item,ind) => {
                 return (
                   <tr key={item.TrainNo}>
-                    <td><b>{item?.BookedSeats[ind]?.userId?.FirstName}</b></td>
+                    <td><b>{item?.user?.FirstName}</b></td>
                     <td><b>{item.TrainNo}</b></td>
                     <td><b>{item.TrainName}</b></td>
                     <td>{item.Origin}</td>
                     <td>{item.Destination}</td>
                     <td>{Gettime(item.ArrivalTime)}</td>
                     <td>{Gettime(item.DepartureTime)}</td>
-                    <td>{item?.BookedSeats[ind]?.seatNumber}</td>
+                    <td>{item?.seatNumber}</td>
                     <td>{item.Fare}</td>
                   </tr>
                 );
